@@ -1,0 +1,28 @@
+[package]
+name = "wist-artifact"
+version = "0.1.0" #@gxl:set(version)
+edition = "2024"
+license = "Apache-2.0"
+authors = ["wist Dev Team"]
+description = "wist 制品的传输与校验口径：读来源（本机 / URL，带限大小）、摘要、版本比较、命名与寻址。不含发布计划与包身份解析。"
+repository = "https://github.com/dayu-sec/wist-artifact"
+homepage = "https://github.com/dayu-sec/wist-artifact"
+documentation = "https://docs.rs/wist-artifact"
+readme = "README.md"
+keywords = ["wist", "artifact", "digest", "version", "integrity"]
+categories = ["data-structures", "network-programming"]
+
+[dependencies]
+# sha256（裸 hex）。选 sha2 而不是 ring：纯 Rust，不把 C/汇编依赖带给每一个消费方
+# （与 `wist-contracts::fact_summary` 选 sha2 的理由一致）。sha256 的输出与实现无关。
+sha2 = "0.10"
+# 拉取来源制品（本机路径直接读；URL 走 reqwest）。rustls 后端。
+# 版本与 center / gateway / gwlinkd / agentd 对齐（它们都在 0.13）——
+# 这样 `read_source_with_client` 才能接住调用方自己的 client（例如 agentd 的 mTLS 身份）。
+reqwest = { version = "0.13", default-features = false, features = ["rustls"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[lib]
+path = "src/lib.rs"
